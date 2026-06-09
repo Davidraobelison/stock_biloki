@@ -34,11 +34,11 @@
                 </div>
                 <div class="rounded-lg bg-gray-50 px-4 py-3">
                     <dt class="text-xs font-medium text-gray-400 uppercase">Téléphone</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $client->phone ?? '—' }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $client->phone ?? '-' }}</dd>
                 </div>
                 <div class="rounded-lg bg-gray-50 px-4 py-3 sm:col-span-2">
                     <dt class="text-xs font-medium text-gray-400 uppercase">Adresse</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $client->address ?? '—' }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $client->address ?? '-' }}</dd>
                 </div>
             </dl>
         </div>

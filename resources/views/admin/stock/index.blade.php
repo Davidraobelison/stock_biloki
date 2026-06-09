@@ -17,7 +17,7 @@
                 @forelse($products as $product)
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 font-medium text-gray-900">{{ $product->name }}</td>
-                    <td class="px-4 py-3 text-gray-500">{{ $product->category->name ?? '—' }}</td>
+                    <td class="px-4 py-3 text-gray-500">{{ $product->category->name ?? '-' }}</td>
                     <td class="px-4 py-3 text-center font-semibold
                                {{ $product->stock_quantity <= 0 ? 'text-red-600' : ($product->isLowStock() ? 'text-yellow-600' : 'text-gray-700') }}">
                         {{ $product->stock_quantity }}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Client;
 use App\Models\Product;
+use App\Models\Sale;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -19,6 +20,8 @@ class DashboardController extends Controller
                                   ->where('stock_quantity', '>', 0)
                                   ->count();
 
+        $newClientsLast6Months = Client::where('created_at', '>=', now()->subMonths(6)->startOfMonth())->count();
+
         $stockByCategory = Category::withSum('products', 'stock_quantity')
             ->get()
             ->map(fn ($c) => [
@@ -26,21 +29,27 @@ class DashboardController extends Controller
                 'total' => (int) ($c->products_sum_stock_quantity ?? 0),
             ]);
 
-        $newClientsByMonth = Client::selectRaw(
-                "DATE_TRUNC('month', created_at) AS month_start, COUNT(*) AS count"
-            )
-            ->where('created_at', '>=', now()->subMonths(5)->startOfMonth())
-            ->groupByRaw("DATE_TRUNC('month', created_at)")
-            ->orderByRaw("DATE_TRUNC('month', created_at)")
-            ->get()
-            ->map(fn ($row) => [
-                'month' => \Carbon\Carbon::parse($row->month_start)->translatedFormat('M Y'),
-                'count' => (int) $row->count,
+        // CA par jour sur les 30 derniers jours
+        $caParJourRaw = Sale::selectRaw("DATE(created_at) AS day, SUM(total_amount) AS total")
+            ->where('status', 'completed')
+            ->where('created_at', '>=', now()->subDays(29)->startOfDay())
+            ->groupByRaw('DATE(created_at)')
+            ->orderByRaw('DATE(created_at)')
+            ->pluck('total', 'day');
+
+        // Remplir les jours sans vente avec 0
+        $caParJour = collect();
+        for ($i = 29; $i >= 0; $i--) {
+            $day = now()->subDays($i)->format('Y-m-d');
+            $caParJour->push([
+                'day'   => now()->subDays($i)->translatedFormat('d/m'),
+                'total' => (float) ($caParJourRaw[$day] ?? 0),
             ]);
+        }
 
         return view('admin.dashboard', compact(
             'totalProducts', 'totalClients', 'outOfStock', 'lowStock',
-            'stockByCategory', 'newClientsByMonth'
+            'newClientsLast6Months', 'stockByCategory', 'caParJour'
         ));
     }
 }

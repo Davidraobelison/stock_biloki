@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'description', 'price',
+        'code', 'name', 'slug', 'description', 'price',
         'stock_quantity', 'stock_alert', 'image', 'category_id',
     ];
 
@@ -32,6 +32,11 @@ class Product extends Model
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function saleItems(): HasMany
+    {
+        return $this->hasMany(SaleItem::class);
     }
 
     public function getStatusAttribute(): string

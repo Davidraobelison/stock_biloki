@@ -17,8 +17,8 @@ return new class extends Migration
         $table->string('slug')->unique();
         $table->text('description')->nullable();
         $table->decimal('price', 10, 2);
-        $table->integer('stock_quantity')->default(0);
-        $table->integer('stock_alert')->default(5);
+        $table->decimal('stock_quantity', 10, 2)->default(0);
+        $table->decimal('stock_alert', 10, 2)->default(5);
         $table->string('image')->nullable();
         $table->foreignId('category_id')->constrained()->onDelete('cascade');
         $table->timestamps();

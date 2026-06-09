@@ -2,7 +2,7 @@
     <x-slot name="header">Dashboard</x-slot>
 
     {{-- Stat cards --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <p class="text-sm font-medium text-gray-500">Total produits</p>
             <p class="mt-2 text-3xl font-bold text-gray-900">{{ $totalProducts }}</p>
@@ -10,6 +10,10 @@
         <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <p class="text-sm font-medium text-gray-500">Total clients</p>
             <p class="mt-2 text-3xl font-bold text-gray-900">{{ $totalClients }}</p>
+        </div>
+        <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-indigo-200">
+            <p class="text-sm font-medium text-indigo-500">Nouveaux clients (6 mois)</p>
+            <p class="mt-2 text-3xl font-bold text-indigo-600">{{ $newClientsLast6Months }}</p>
         </div>
         <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-red-200">
             <p class="text-sm font-medium text-red-500">Rupture de stock</p>
@@ -30,10 +34,10 @@
             <canvas id="chartCategories" height="220"></canvas>
         </div>
 
-        {{-- Nouveaux clients par mois --}}
+        {{-- Évolution CA par jour --}}
         <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <h2 class="mb-4 text-sm font-semibold text-gray-700">Nouveaux clients (6 derniers mois)</h2>
-            <canvas id="chartClients" height="220"></canvas>
+            <h2 class="mb-4 text-sm font-semibold text-gray-700">Évolution du CA (30 derniers jours)</h2>
+            <canvas id="chartCA" height="220"></canvas>
         </div>
     </div>
 
@@ -56,7 +60,7 @@
             <li class="flex items-center justify-between px-6 py-3">
                 <div>
                     <p class="text-sm font-medium text-gray-800">{{ $p->name }}</p>
-                    <p class="text-xs text-gray-400">{{ $p->category->name ?? '—' }}</p>
+                    <p class="text-xs text-gray-400">{{ $p->category->name ?? '-' }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-semibold text-gray-700">{{ $p->stock_quantity }} unités</span>
@@ -76,7 +80,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         const categoryData = @json($stockByCategory);
-        const clientData   = @json($newClientsByMonth);
+        const caData       = @json($caParJour);
 
         new Chart(document.getElementById('chartCategories'), {
             type: 'bar',
@@ -92,21 +96,40 @@
             options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
 
-        new Chart(document.getElementById('chartClients'), {
+        new Chart(document.getElementById('chartCA'), {
             type: 'line',
             data: {
-                labels: clientData.map(d => d.month),
+                labels: caData.map(d => d.day),
                 datasets: [{
-                    label: 'Nouveaux clients',
-                    data: clientData.map(d => d.count),
-                    borderColor: 'rgba(16,185,129,1)',
-                    backgroundColor: 'rgba(16,185,129,0.1)',
+                    label: 'CA (Ar)',
+                    data: caData.map(d => d.total),
+                    borderColor: 'rgba(99,102,241,1)',
+                    backgroundColor: 'rgba(99,102,241,0.08)',
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 4,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
                 }]
             },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' Ar'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: v => new Intl.NumberFormat('fr-FR', { notation: 'compact' }).format(v) + ' Ar'
+                        }
+                    },
+                    x: { ticks: { maxTicksLimit: 10 } }
+                }
+            }
         });
     </script>
     @endpush

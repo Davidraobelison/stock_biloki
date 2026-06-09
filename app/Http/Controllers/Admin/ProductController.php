@@ -23,15 +23,15 @@ class ProductController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        $products   = $query->latest()->paginate(20)->withQueryString();
-        $categories = Category::orderBy('name')->get();
+        $products   = $query->latest()->paginate(20, ['*'])->withQueryString();
+        $categories = Category::orderBy('name', 'asc')->get();
 
         return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::orderBy('name', 'asc')->get();
 
         return view('admin.products.create', compact('categories'));
     }
@@ -54,7 +54,8 @@ class ProductController extends Controller
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Product::create($validated);
+        $product = Product::create($validated);
+        $product->update(['code' => 'PRD-' . str_pad($product->id, 4, '0', STR_PAD_LEFT)]);
 
         return redirect()->route('admin.products.index')
                          ->with('success', 'Produit créé avec succès.');
@@ -67,7 +68,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::orderBy('name', 'asc')->get();
 
         return view('admin.products.edit', compact('product', 'categories'));
     }
@@ -109,6 +110,54 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
                          ->with('success', 'Produit supprimé.');
+    }
+
+    public function export()
+    {
+        $products = Product::with('category')->orderBy('name', 'asc')->get();
+
+        return response()->streamDownload(function () use ($products) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($handle, ['Code', 'Nom', 'Catégorie', 'Prix (Ar)', 'Stock', 'Seuil alerte', 'Statut', 'Créé le'], ';');
+
+            foreach ($products as $product) {
+                fputcsv($handle, [
+                    $product->code ?? '',
+                    $product->name,
+                    $product->category?->name ?? '',
+                    $product->price,
+                    $product->stock_quantity,
+                    $product->stock_alert,
+                    match($product->status) {
+                        'out_of_stock' => 'Rupture',
+                        'low_stock'    => 'Stock faible',
+                        default        => 'En stock',
+                    },
+                    $product->created_at->format('d/m/Y'),
+                ], ';');
+            }
+
+            fclose($handle);
+        }, 'produits_' . now()->format('Ymd') . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ], 'attachment');
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->input('q', '');
+
+        $products = Product::where('stock_quantity', '>', 0)
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'ilike', "%{$q}%")
+                      ->orWhere('code', 'ilike', "%{$q}%");
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'code', 'name', 'price', 'stock_quantity']);
+
+        return response()->json($products);
     }
 
     private function uniqueSlug(string $name, ?int $excludeId = null): string

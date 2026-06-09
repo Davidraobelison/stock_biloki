@@ -26,10 +26,16 @@
             @endif
         </form>
 
-        <a href="{{ route('admin.products.create') }}"
-           class="shrink-0 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
-            + Nouveau produit
-        </a>
+        <div class="flex shrink-0 gap-2">
+            <a href="{{ route('admin.products.export') }}"
+               class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                ↓ Export CSV
+            </a>
+            <a href="{{ route('admin.products.create') }}"
+               class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+                + Nouveau produit
+            </a>
+        </div>
     </div>
 
     {{-- Table --}}
@@ -37,6 +43,7 @@
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <tr>
+                    <th class="px-4 py-3 text-left">Code</th>
                     <th class="px-4 py-3 text-left">Produit</th>
                     <th class="px-4 py-3 text-left">Catégorie</th>
                     <th class="px-4 py-3 text-right">Prix</th>
@@ -48,6 +55,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($products as $product)
                 <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ $product->code ?? '—' }}</td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
                             @if($product->image)
@@ -69,8 +77,8 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-gray-600">{{ $product->category->name ?? '—' }}</td>
-                    <td class="px-4 py-3 text-right font-medium text-gray-900">{{ number_format($product->price, 2) }} €</td>
+                    <td class="px-4 py-3 text-gray-600">{{ $product->category->name ?? '-' }}</td>
+                    <td class="px-4 py-3 text-right font-medium text-gray-900">{{ number_format($product->price, 2) }} Ar</td>
                     <td class="px-4 py-3 text-center font-semibold text-gray-700">{{ $product->stock_quantity }}</td>
                     <td class="px-4 py-3 text-center">
                         @if($product->status === 'out_of_stock')

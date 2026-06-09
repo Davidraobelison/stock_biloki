@@ -6,7 +6,7 @@
         {{-- Produit info + alerte --}}
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <div>
-                <p class="text-sm text-gray-500">{{ $product->category->name ?? '—' }}</p>
+                <p class="text-sm text-gray-500">{{ $product->category->name ?? '-' }}</p>
                 <h2 class="mt-1 text-xl font-bold text-gray-900">{{ $product->name }}</h2>
                 <div class="mt-2 flex items-center gap-3">
                     <span class="text-3xl font-bold {{ $product->stock_quantity <= 0 ? 'text-red-600' : ($product->isLowStock() ? 'text-yellow-600' : 'text-gray-900') }}">
@@ -116,7 +116,7 @@
                         </td>
                         <td class="px-4 py-3 text-center text-gray-400">{{ $m->before_quantity }}</td>
                         <td class="px-4 py-3 text-center font-medium text-gray-700">{{ $m->after_quantity }}</td>
-                        <td class="px-4 py-3 text-gray-500">{{ $m->note ?? '—' }}</td>
+                        <td class="px-4 py-3 text-gray-500">{{ $m->note ?? '-' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $m->user->name ?? 'Système' }}</td>
                     </tr>
                     @empty
