@@ -34,6 +34,7 @@
         <table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 <tr>
+                    <th class="px-4 py-3 text-left">Code</th>
                     <th class="px-4 py-3 text-left">Nom</th>
                     <th class="px-4 py-3 text-left">Email</th>
                     <th class="px-4 py-3 text-left">Téléphone</th>
@@ -45,6 +46,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($clients as $client)
                 <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ $client->code ?? '—' }}</td>
                     <td class="px-4 py-3">
                         <a href="{{ route('admin.clients.show', $client) }}"
                            class="font-medium text-indigo-600 hover:text-indigo-800">
@@ -52,8 +54,8 @@
                         </a>
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ $client->email }}</td>
-                    <td class="px-4 py-3 text-gray-500">{{ $client->phone ?? '—' }}</td>
-                    <td class="px-4 py-3 text-gray-500 max-w-xs truncate">{{ $client->address ?? '—' }}</td>
+                    <td class="px-4 py-3 text-gray-500">{{ $client->phone ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-500 max-w-xs truncate">{{ $client->address ?? '-' }}</td>
                     <td class="px-4 py-3 text-gray-400">{{ $client->created_at->format('d/m/Y') }}</td>
                     <td class="px-4 py-3 text-right">
                         <div class="flex items-center justify-end gap-2">

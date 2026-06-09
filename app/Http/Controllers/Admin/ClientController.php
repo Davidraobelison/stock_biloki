@@ -40,7 +40,8 @@ class ClientController extends Controller
             'address' => 'nullable|string|max:500',
         ]);
 
-        Client::create($validated);
+        $client = Client::create($validated);
+        $client->update(['code' => 'CLT-' . str_pad($client->id, 4, '0', STR_PAD_LEFT)]);
 
         return redirect()->route('admin.clients.index')
                          ->with('success', 'Client créé avec succès.');
@@ -103,5 +104,21 @@ class ClientController extends Controller
         }, 'clients_' . now()->format('Ymd') . '.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->input('q', '');
+
+        $clients = Client::whereRaw(
+                '(name ilike ? or code ilike ?)',
+                ["%{$q}%", "%{$q}%"],
+                'and'
+            )
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'code', 'name']);
+
+        return response()->json($clients);
     }
 }

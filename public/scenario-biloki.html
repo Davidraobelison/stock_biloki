@@ -1,0 +1,316 @@
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biloki Admin — Scénario complet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1f2937; background: #fff; }
+  .page { max-width: 800px; margin: 0 auto; padding: 40px 48px; }
+
+  /* Header */
+  .header { display: flex; align-items: center; gap: 14px; border-bottom: 2px solid #4f46e5; padding-bottom: 20px; margin-bottom: 28px; }
+  .logo { width: 44px; height: 44px; background: #4f46e5; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo svg { width: 26px; height: 26px; color: #fff; }
+  .header-title h1 { font-size: 22px; font-weight: 700; color: #1f2937; }
+  .header-title p { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  /* Sections */
+  .section { margin-bottom: 26px; page-break-inside: avoid; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .step-badge { width: 26px; height: 26px; background: #4f46e5; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1f2937; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  thead tr { background: #f3f4f6; }
+  th { padding: 7px 10px; text-align: left; font-weight: 600; color: #374151; border: 1px solid #e5e7eb; }
+  td { padding: 6px 10px; border: 1px solid #e5e7eb; color: #374151; }
+  tr:nth-child(even) td { background: #f9fafb; }
+
+  /* Code blocks */
+  pre { background: #1e293b; color: #e2e8f0; padding: 12px 16px; border-radius: 8px; font-size: 11px; font-family: 'Courier New', monospace; margin-top: 8px; overflow: hidden; }
+  code { background: #f3f4f6; color: #4f46e5; padding: 1px 5px; border-radius: 4px; font-size: 11px; font-family: 'Courier New', monospace; }
+
+  /* Info boxes */
+  .info { background: #eff6ff; border-left: 3px solid #3b82f6; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 8px; font-size: 12px; color: #1e40af; }
+  .success { background: #f0fdf4; border-left: 3px solid #22c55e; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 8px; font-size: 12px; color: #166534; }
+  .warning { background: #fffbeb; border-left: 3px solid #f59e0b; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 8px; font-size: 12px; color: #92400e; }
+
+  /* Summary card */
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .summary-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center; }
+  .summary-card .label { font-size: 11px; color: #6b7280; }
+  .summary-card .value { font-size: 18px; font-weight: 700; color: #1f2937; margin-top: 2px; }
+  .summary-card.indigo { border-color: #c7d2fe; background: #eef2ff; }
+  .summary-card.indigo .value { color: #4f46e5; }
+  .summary-card.green { border-color: #bbf7d0; background: #f0fdf4; }
+  .summary-card.green .value { color: #16a34a; }
+  .summary-card.red { border-color: #fecaca; background: #fef2f2; }
+  .summary-card.red .value { color: #dc2626; }
+
+  /* Caisse recap */
+  .caisse-recap { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+  .caisse-row { display: flex; justify-content: space-between; padding: 8px 14px; font-size: 12px; border-bottom: 1px solid #f3f4f6; }
+  .caisse-row:last-child { border-bottom: none; font-weight: 700; background: #f0fdf4; }
+  .caisse-row .cr-label { color: #374151; }
+  .caisse-row .cr-value { font-weight: 600; }
+  .cr-plus { color: #16a34a; }
+  .cr-minus { color: #dc2626; }
+  .cr-total { color: #1f2937; font-size: 13px; }
+
+  /* Flow */
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+  .flow-item { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 600; }
+  .flow-arrow { color: #9ca3af; font-size: 14px; }
+
+  /* Footer */
+  .footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; }
+
+  /* Print */
+  @media print {
+    body { font-size: 12px; }
+    .page { padding: 20px 30px; }
+    .section { page-break-inside: avoid; }
+    pre { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #e5e7eb; }
+    @page { margin: 1.5cm; size: A4; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+      </svg>
+    </div>
+    <div class="header-title">
+      <h1>Biloki Admin — Scénario complet</h1>
+      <p>Guide de démarrage de zéro à un résultat concret &nbsp;·&nbsp; Gestion de stock & caisse</p>
+    </div>
+  </div>
+
+  <!-- Flux global -->
+  <div class="section">
+    <div class="flow">
+      <span class="flow-item">1. Catégories</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-item">2. Produits</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-item">3. Clients</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-item">4. Ouvrir caisse</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-item">5. Ventes</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-item">6. Fermer caisse</span>
+    </div>
+  </div>
+
+  <!-- Étape 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">2</div>
+      <div class="section-title">Créer les catégories — Sidebar → Catégories → Nouvelle catégorie</div>
+    </div>
+    <table>
+      <thead><tr><th>Nom</th><th>Slug (généré auto)</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Alimentation</td><td>alimentation</td><td>Produits alimentaires de base</td></tr>
+        <tr><td>Boisson</td><td>boisson</td><td>Eaux, jus, sodas</td></tr>
+        <tr><td>Hygiène</td><td>hygiene</td><td>Savons, détergents, cosmétiques</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Étape 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">3</div>
+      <div class="section-title">Créer les produits — Sidebar → Produits → Nouveau produit</div>
+    </div>
+    <table>
+      <thead><tr><th>Code</th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Seuil alerte</th></tr></thead>
+      <tbody>
+        <tr><td><code>PRD-0001</code></td><td>Riz 5kg</td><td>Alimentation</td><td>15 000 Ar</td><td>50</td><td>10</td></tr>
+        <tr><td><code>PRD-0002</code></td><td>Huile 1L</td><td>Alimentation</td><td>8 500 Ar</td><td>30</td><td>5</td></tr>
+        <tr><td><code>PRD-0003</code></td><td>Eau minérale</td><td>Boisson</td><td>1 200 Ar</td><td>100</td><td>20</td></tr>
+        <tr><td><code>PRD-0004</code></td><td>Savon Palmolive</td><td>Hygiène</td><td>2 500 Ar</td><td>40</td><td>8</td></tr>
+      </tbody>
+    </table>
+    <div class="info">Les codes <code>PRD-XXXX</code> sont générés automatiquement à la création.</div>
+  </div>
+
+  <!-- Étape 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">4</div>
+      <div class="section-title">Enregistrer les clients — Sidebar → Clients → Nouveau client</div>
+    </div>
+    <table>
+      <thead><tr><th>Code</th><th>Nom</th><th>Téléphone</th><th>Adresse</th></tr></thead>
+      <tbody>
+        <tr><td><code>CLT-0001</code></td><td>Lanto Rakotondrabe</td><td>034 12 345 67</td><td>Antananarivo</td></tr>
+        <tr><td><code>CLT-0002</code></td><td>Hery Randriamaro</td><td>032 98 765 43</td><td>Antsirabe</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Étape 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">5</div>
+      <div class="section-title">Ouvrir la caisse — Sidebar → Caisse → "Ouvrir la caisse"</div>
+    </div>
+    <table>
+      <thead><tr><th>Champ</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>Solde d'ouverture</td><td><strong>50 000 Ar</strong> (fond de caisse du matin)</td></tr>
+        <tr><td>Notes</td><td>Ouverture 09h00</td></tr>
+      </tbody>
+    </table>
+    <div class="warning">La caisse doit être ouverte <strong>avant</strong> de faire des ventes pour que les mouvements soient enregistrés automatiquement.</div>
+  </div>
+
+  <!-- Étape 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">6</div>
+      <div class="section-title">Enregistrer des ventes — Sidebar → Ventes → Nouvelle vente</div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;margin-bottom:6px;color:#374151;">Vente 1 — Client identifié, paiement Espèces</p>
+    <table>
+      <thead><tr><th>Champ</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>Client</td><td>Taper <code>Lanto</code> → sélectionner <code>CLT-0001 – Lanto Rakotondrabe</code></td></tr>
+        <tr><td>Produit 1</td><td>Taper <code>Riz</code> → sélectionner <code>PRD-0001</code> → quantité <strong>2</strong></td></tr>
+        <tr><td>Produit 2</td><td>Taper <code>Huile</code> → sélectionner <code>PRD-0002</code> → quantité <strong>1</strong></td></tr>
+        <tr><td>Mode de paiement</td><td>Espèces</td></tr>
+        <tr><td><strong>Total calculé</strong></td><td><strong>38 500 Ar</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="success">✓ Mouvement automatique créé dans la caisse : <strong>+ 38 500 Ar</strong> (Vente VNT-2026-0001 – Espèces)</div>
+
+    <p style="font-size:12px;font-weight:600;margin:14px 0 6px;color:#374151;">Vente 2 — Vente directe (sans client), paiement MVola</p>
+    <table>
+      <thead><tr><th>Champ</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>Client</td><td>Laisser vide (vente directe)</td></tr>
+        <tr><td>Produit 1</td><td>Eau minérale <code>PRD-0003</code> → quantité <strong>3</strong></td></tr>
+        <tr><td>Produit 2</td><td>Savon Palmolive <code>PRD-0004</code> → quantité <strong>1</strong></td></tr>
+        <tr><td>Mode de paiement</td><td>MVola</td></tr>
+        <tr><td><strong>Total calculé</strong></td><td><strong>6 100 Ar</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="success">✓ Mouvement automatique créé dans la caisse : <strong>+ 6 100 Ar</strong> (Vente VNT-2026-0002 – MVola)</div>
+    <div class="info">Ticket de caisse : après chaque vente → bouton <strong>"Ticket"</strong> sur la page de détail → Ctrl+P pour imprimer (format thermique 320px)</div>
+  </div>
+
+  <!-- Étape 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">7</div>
+      <div class="section-title">Dépense manuelle dans la caisse</div>
+    </div>
+    <table>
+      <thead><tr><th>Champ</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>Type</td><td>Sortie / Dépense</td></tr>
+        <tr><td>Montant</td><td>5 000 Ar</td></tr>
+        <tr><td>Description</td><td>Achat sacs emballages</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Étape 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge">8</div>
+      <div class="section-title">Fermer la caisse en fin de journée</div>
+    </div>
+    <div class="caisse-recap">
+      <div class="caisse-row"><span class="cr-label">Solde d'ouverture</span><span class="cr-value">50 000 Ar</span></div>
+      <div class="caisse-row"><span class="cr-label">+ Entrées (ventes espèces + MVola)</span><span class="cr-value cr-plus">+ 44 600 Ar</span></div>
+      <div class="caisse-row"><span class="cr-label">− Sortie (achat emballages)</span><span class="cr-value cr-minus">− 5 000 Ar</span></div>
+      <div class="caisse-row"><span class="cr-label">Solde attendu</span><span class="cr-value cr-total">89 600 Ar</span></div>
+    </div>
+    <div style="margin-top:10px;">
+      <table>
+        <thead><tr><th>Champ</th><th>Valeur</th></tr></thead>
+        <tbody>
+          <tr><td>Solde physique compté</td><td>89 600 Ar</td></tr>
+          <tr><td>Écart</td><td><strong>0 Ar ✓</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="success">Session fermée — bilan enregistré dans l'historique des sessions.</div>
+  </div>
+
+  <!-- Résultats -->
+  <div class="section">
+    <div class="section-header">
+      <div class="step-badge" style="background:#059669;">✓</div>
+      <div class="section-title">Résultats visibles dans l'application</div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;margin-bottom:8px;color:#374151;">Dashboard</p>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="label">Total produits</div><div class="value">4</div></div>
+      <div class="summary-card"><div class="label">Total clients</div><div class="value">2</div></div>
+      <div class="summary-card indigo"><div class="label">Nouveaux clients (6 mois)</div><div class="value">2</div></div>
+      <div class="summary-card green"><div class="label">Rupture de stock</div><div class="value">0</div></div>
+      <div class="summary-card green"><div class="label">Stock faible</div><div class="value">0</div></div>
+      <div class="summary-card indigo"><div class="label">CA aujourd'hui</div><div class="value">44 600 Ar</div></div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;margin:14px 0 8px;color:#374151;">Stock après ventes</p>
+    <table>
+      <thead><tr><th>Produit</th><th>Stock initial</th><th>Vendu</th><th>Restant</th><th>Statut</th></tr></thead>
+      <tbody>
+        <tr><td>Riz 5kg</td><td>50</td><td>2</td><td>48</td><td>✓ Normal</td></tr>
+        <tr><td>Huile 1L</td><td>30</td><td>1</td><td>29</td><td>✓ Normal</td></tr>
+        <tr><td>Eau minérale</td><td>100</td><td>3</td><td>97</td><td>✓ Normal</td></tr>
+        <tr><td>Savon Palmolive</td><td>40</td><td>1</td><td>39</td><td>✓ Normal</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:12px;font-weight:600;margin:14px 0 8px;color:#374151;">Page Paiements (filtre : Aujourd'hui)</p>
+    <table>
+      <thead><tr><th>Mode</th><th>Nb ventes</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>Espèces</td><td>1</td><td>38 500 Ar</td></tr>
+        <tr><td>MVola</td><td>1</td><td>6 100 Ar</td></tr>
+        <tr><td><strong>Total encaissé</strong></td><td><strong>2</strong></td><td><strong>44 600 Ar</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Biloki Admin — Guide de démarrage</span>
+    <span>Laravel 13 · PostgreSQL · Tailwind CSS · Alpine.js</span>
+  </div>
+
+</div>
+
+<script>
+  // Auto-print si ?print=1 dans l'URL
+//   if (window.location.search.includes('print=1')) window.print();
+</script>
+</body>
+</html>

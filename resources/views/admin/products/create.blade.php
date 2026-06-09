@@ -27,7 +27,7 @@
                     {{-- Prix + Catégorie --}}
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Prix (€) <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700">Prix (Ar) <span class="text-red-500">*</span></label>
                             <input type="number" name="price" value="{{ old('price') }}" step="0.01" min="0"
                                    class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
                                           @error('price') border-red-500 @enderror">
@@ -38,7 +38,7 @@
                             <select name="category_id"
                                     class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm
                                            @error('category_id') border-red-500 @enderror">
-                                <option value="">— Choisir —</option>
+                                <option value="">- Choisir -</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
                                 @endforeach
